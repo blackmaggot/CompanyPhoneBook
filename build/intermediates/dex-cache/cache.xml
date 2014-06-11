@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<pre-dex-items>
+
+    <item
+        dex="/home/blackmaggot/dupa5/CompanyPhoneBook/app/build/intermediates/pre-dexed/debug/classes-d371e78de4db99b32bd57a0e24a450fe94f24388.jar"
+        jar="/home/blackmaggot/dupa5/CompanyPhoneBook/build/intermediates/exploded-aar/com.android.support/appcompat-v7/19.1.0/classes.jar"
+        jumboMode="false"
+        revision="19.1.0"
+        sha1="3499ceba05ca1f6037c6a2fad73df8f636224a28"/>
+    <item
+        dex="/home/blackmaggot/dupa5/CompanyPhoneBook/app/build/intermediates/pre-dexed/debug/support-v4-19.1.0-0042a6a475e4f000560541d853b7f32a93b5055d.jar"
+        jar="/home/blackmaggot/android-studio/sdk/extras/android/m2repository/com/android/support/support-v4/19.1.0/support-v4-19.1.0.jar"
+        jumboMode="false"
+        revision="19.1.0"
+        sha1="85f201b380937e61a9dce6ca90ccf6872abbfb67"/>
+
+</pre-dex-items>

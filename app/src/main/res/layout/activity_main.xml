@@ -31,27 +31,6 @@
                 android:layout_height="fill_parent">
 
                 <LinearLayout
-                    android:id="@+id/Contacts"
-                    android:layout_width="fill_parent"
-                    android:layout_height="fill_parent"
-                    android:orientation="vertical"
-                    android:focusableInTouchMode="false">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textAppearance="?android:attr/textAppearanceLarge"
-                        android:text="Contact list"
-                        android:id="@+id/concactHeader"
-                        android:layout_gravity="center_horizontal" />
-
-                    <ListView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:id="@+id/listView" />
-                </LinearLayout>
-
-                <LinearLayout
                     android:id="@+id/Creator"
                     android:layout_width="fill_parent"
                     android:layout_height="fill_parent"
@@ -65,6 +44,14 @@
                         android:text="Contact creator"
                         android:id="@+id/creatorHeader"
                         android:layout_gravity="center_horizontal" />
+
+                    <ImageView
+                        android:layout_width="100dp"
+                        android:layout_height="100dp"
+                        android:id="@+id/contactImgView"
+                        android:layout_gravity="center"
+                        android:layout_margin="10dp"
+                        android:src="@drawable/unknown_person" />
 
                     <EditText
                         android:layout_width="fill_parent"
@@ -104,6 +91,27 @@
                         android:id="@+id/submitCreateButton"
                         android:text="Save contact"
                         android:enabled="false" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/Contacts"
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent"
+                    android:orientation="vertical"
+                    android:focusableInTouchMode="false">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?android:attr/textAppearanceLarge"
+                        android:text="Contact list"
+                        android:id="@+id/concactHeader"
+                        android:layout_gravity="center_horizontal" />
+
+                    <ListView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/listView" />
                 </LinearLayout>
 
             </FrameLayout>

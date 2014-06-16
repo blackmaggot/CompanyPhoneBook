@@ -1,5 +1,6 @@
 package org.companyphonebook.app;
 
+import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.text.Editable;
@@ -12,6 +13,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TabHost;
 import android.widget.TextView;
@@ -26,6 +28,7 @@ public class MainActivity extends ActionBarActivity {
 
     EditText firstName, lastName, emailAdress, phoneNumber;
     List<Contact> Contacts = new ArrayList<Contact>();
+    ImageView contactImgView;
     ListView contactListView;
 
 
@@ -47,6 +50,10 @@ public class MainActivity extends ActionBarActivity {
         emailAdress = (EditText) findViewById(R.id.emailAdress);
         phoneNumber = (EditText) findViewById(R.id.phoneNumber);
         contactListView = (ListView) findViewById(R.id.listView);
+        contactImgView = (ImageView) findViewById(R.id.contactImgView);
+
+
+
         TabHost tabHost = (TabHost) findViewById(R.id.tabHost);
 
         tabHost.setup();
@@ -88,6 +95,24 @@ public class MainActivity extends ActionBarActivity {
 
             }
         });
+
+        contactImgView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent();
+                intent.setType("image/*");
+                intent.setAction(Intent.ACTION_GET_CONTENT);
+                startActivityForResult(Intent.createChooser(intent, "Select Contact Image"), 1);
+            }
+        });
+    }
+
+
+    public void  onActivityResult(int reqCode, int resCode, Intent data){
+        if (resCode == RESULT_OK){
+            if (reqCode == 1)
+                contactImgView.setImageURI(data.getData());
+        }
     }
     private void populateList(){
         ArrayAdapter<Contact> adapter = new ContactListAdapter();

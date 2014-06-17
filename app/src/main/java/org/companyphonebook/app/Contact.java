@@ -1,15 +1,19 @@
 package org.companyphonebook.app;
 
+import android.net.Uri;
+
 /**
  * Created by blackmaggot on 09.06.14.
  */
 public class Contact {
     private String _firstName, _lastName, _email, _phone;
-    public Contact(String firstName, String lastName, String phone, String email){
+    private  Uri _imageURI;
+    public Contact(String firstName, String lastName, String phone, String email, Uri imageURI){
         _firstName = firstName;
         _lastName = lastName;
         _email = email;
         _phone = phone;
+        _imageURI = imageURI;
 
     }
     public String getFirstName(){
@@ -24,4 +28,5 @@ public class Contact {
     public String getPhone(){
         return _phone;
     }
+    public Uri get_imageURI() {return _imageURI;}
 }

@@ -1,6 +1,8 @@
 package org.companyphonebook.app;
 
 import android.content.Intent;
+import android.net.Uri;
+import android.os.NetworkOnMainThreadException;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.text.Editable;
@@ -19,6 +21,17 @@ import android.widget.TabHost;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicNameValuePair;
+
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,6 +43,7 @@ public class MainActivity extends ActionBarActivity {
     List<Contact> Contacts = new ArrayList<Contact>();
     ImageView contactImgView;
     ListView contactListView;
+    Uri imageUri = null;
 
 
     @Override
@@ -69,12 +83,14 @@ public class MainActivity extends ActionBarActivity {
         tabHost.addTab(tabSpec);
 
 
+
         final Button submitCreateButton = (Button) findViewById(R.id.submitCreateButton);
         submitCreateButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                addContact(firstName.getText().toString(), lastName.getText().toString(), emailAdress.getText().toString(), phoneNumber.getText().toString());
+                Contacts.add(new Contact(firstName.getText().toString(), lastName.getText().toString(), emailAdress.getText().toString(), phoneNumber.getText().toString(), imageUri));
                 populateList();
+                sendToDB();
                 Toast.makeText((getApplicationContext()), firstName.getText().toString() + " " + lastName.getText().toString()+ "  has been saved in contacts", Toast.LENGTH_SHORT).show();
             }
         });
@@ -110,18 +126,39 @@ public class MainActivity extends ActionBarActivity {
 
     public void  onActivityResult(int reqCode, int resCode, Intent data){
         if (resCode == RESULT_OK){
-            if (reqCode == 1)
+            if (reqCode == 1){
+                imageUri = data.getData();
                 contactImgView.setImageURI(data.getData());
+
+            }
         }
     }
     private void populateList(){
         ArrayAdapter<Contact> adapter = new ContactListAdapter();
         contactListView.setAdapter(adapter);
     }
+    private void sendToDB() {
+        try {
+            final List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(2);
+            nameValuePairs.add(new BasicNameValuePair("firstName", firstName.getText().toString()));
+            nameValuePairs.add(new BasicNameValuePair("lastName", lastName.getText().toString()));
+            nameValuePairs.add(new BasicNameValuePair("emailAdress", emailAdress.getText().toString()));
+            nameValuePairs.add(new BasicNameValuePair("phoneNumber", phoneNumber.getText().toString()));
 
-    public void addContact(String firstName, String lastName, String phone, String email){
-        Contacts.add(new Contact(firstName, lastName, phone, email));
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    DbConnectionAndSending dbConnectionAndSending = new DbConnectionAndSending();
+                    dbConnectionAndSending.sendToDb(nameValuePairs);
+                }
+            }).start();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
+
+
 
     private class ContactListAdapter extends ArrayAdapter<Contact> {
         public ContactListAdapter(){
@@ -143,6 +180,8 @@ public class MainActivity extends ActionBarActivity {
             email.setText(currentContact.getEmail());
             TextView phone = (TextView) view.findViewById(R.id.phoneListField);
             phone.setText(currentContact.getPhone());
+            ImageView ivContactImage = (ImageView) view.findViewById(R.id.ivContactImage);
+            ivContactImage.setImageURI(currentContact.get_imageURI());
 
             return view;
 

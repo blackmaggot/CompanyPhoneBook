@@ -2,14 +2,12 @@ package org.companyphonebook.app;
 
 import android.content.Intent;
 import android.net.Uri;
-import android.os.NetworkOnMainThreadException;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
@@ -23,15 +21,12 @@ import android.widget.Toast;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
+import org.json.JSONException;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
+import java.io.InputStream;
+import java.net.HttpCookie;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -79,8 +74,14 @@ public class MainActivity extends ActionBarActivity {
 
         tabSpec = tabHost.newTabSpec("contactList");
         tabSpec.setContent(R.id.Contacts);
-        tabSpec.setIndicator("List");
+        tabSpec.setIndicator("Local Contacts");
         tabHost.addTab(tabSpec);
+
+        tabSpec = tabHost.newTabSpec("companyContactList");
+        tabSpec.setContent(R.id.companyContacts);
+        tabSpec.setIndicator("Company contacts");
+        tabHost.addTab(tabSpec);
+
 
 
 
@@ -121,6 +122,7 @@ public class MainActivity extends ActionBarActivity {
                 startActivityForResult(Intent.createChooser(intent, "Select Contact Image"), 1);
             }
         });
+
     }
 
 
@@ -148,10 +150,30 @@ public class MainActivity extends ActionBarActivity {
             new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    DbConnectionAndSending dbConnectionAndSending = new DbConnectionAndSending();
-                    dbConnectionAndSending.sendToDb(nameValuePairs);
+                    DbConnectionAndPost dbConnectionAndPost = new DbConnectionAndPost();
+                    dbConnectionAndPost.postToDb(nameValuePairs);
+
                 }
             }).start();
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    DbConnectionAndPost dbConnectionAndPost = new DbConnectionAndPost();
+                    try {
+                        InputStream getJson = dbConnectionAndPost.getFromDb().getEntity().getContent();
+                        //Log.w("getJson", dbConnectionAndPost.streamToStringConverter(getJson));
+                        //String dupa = dbConnectionAndPost.getStringToJson(dbConnectionAndPost.streamToStringConverter(getJson)).getString("firstName");
+                        //Log.w("getJson", dupa);
+                        dbConnectionAndPost.jsonArrayToArrayList(dbConnectionAndPost.getStringToJsonArray(dbConnectionAndPost.streamToStringConverter(getJson)));
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+
+                }
+            }).start();
+
 
         } catch (Exception e) {
             e.printStackTrace();

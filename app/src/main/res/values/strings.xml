@@ -5,5 +5,8 @@
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
     <string name="contactList">Contact List</string>
+    <string name="companyContactsTabDescription">Company Contacts</string>
+    <string name="companyContactHeader">Company contact list</string>
+    <string name="CompanyContacts">Company contact list</string>
 
 </resources>

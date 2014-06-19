@@ -3,7 +3,7 @@ package org.companyphonebook.app;
 import android.net.Uri;
 
 /**
- * Created by blackmaggot on 09.06.14.
+ * Created by Wiktor Marchewka on 09.06.14.
  */
 public class Contact {
     private String _firstName, _lastName, _email, _phone;

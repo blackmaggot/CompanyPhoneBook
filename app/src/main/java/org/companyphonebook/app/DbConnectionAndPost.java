@@ -32,7 +32,7 @@ import java.util.List;
 
 
 /**
- * Created by blackmaggot on 17.06.14.
+ * Created by Wiktor Marchewka on 17.06.14.
  */
 public class DbConnectionAndPost {
     String host = "http://89.66.114.229/test/jsonMyql/";
@@ -92,33 +92,11 @@ public class DbConnectionAndPost {
         }
     }
 
-    public JSONObject getStringToJson(String getRequestedString) throws JSONException {
-        JSONObject jsonObject = new JSONObject(getRequestedString);
-        return jsonObject;
+    public JSONArray getStringToJsonArray() throws JSONException, IOException {
+        String getRequestedString = streamToStringConverter(getFromDb().getEntity().getContent());
+        return new JSONArray(getRequestedString);
     }
-    public JSONArray getStringToJsonArray(String getRequestedString) throws JSONException{
-        JSONArray jsonArray = new JSONArray(getRequestedString);
-        return jsonArray;
-    }
-    
-    public ArrayList jsonArrayToArrayList(JSONArray jsonArray) throws JSONException {
-        ArrayList<Contact> Contact = new ArrayList<Contact>();
-        ArrayList<String> items = new ArrayList<String>();
-        for(int i=0; i< jsonArray.length(); i++){
-            JSONObject jsonObject = jsonArray.getJSONObject(i);
-            int id = jsonObject.getInt("ID");
-            String firstName = jsonObject.getString("firstName");
-            String lastName= jsonObject.getString("lastName");
-            String email = jsonObject.getString("email");
-            String phone = jsonObject.getString("phone");
-            items.add(firstName);
-            items.add(lastName);
-            items.add(email);
-            items.add(phone);
-            Log.d(id+", "+firstName+", "+lastName+", "+email+", "+phone, "Output");
-        }
-        return items;
-    }
+
 
 
 

@@ -2,6 +2,7 @@ package org.companyphonebook.app;
 
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Parcel;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.text.Editable;
@@ -19,16 +20,17 @@ import android.widget.TabHost;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
+import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.HttpCookie;
 import java.util.ArrayList;
 import java.util.List;
+import android.net.Uri;
 
 
 public class MainActivity extends ActionBarActivity {
@@ -36,9 +38,14 @@ public class MainActivity extends ActionBarActivity {
 
     EditText firstName, lastName, emailAdress, phoneNumber;
     List<Contact> Contacts = new ArrayList<Contact>();
+    List<CompanyContact> companyContacts = new ArrayList<CompanyContact>();
     ImageView contactImgView;
     ListView contactListView;
+    ListView companyContactListView;
     Uri imageUri = null;
+
+
+
 
 
     @Override
@@ -59,6 +66,7 @@ public class MainActivity extends ActionBarActivity {
         emailAdress = (EditText) findViewById(R.id.emailAdress);
         phoneNumber = (EditText) findViewById(R.id.phoneNumber);
         contactListView = (ListView) findViewById(R.id.listView);
+        companyContactListView = (ListView) findViewById(R.id.companyListView);
         contactImgView = (ImageView) findViewById(R.id.contactImgView);
 
 
@@ -81,17 +89,29 @@ public class MainActivity extends ActionBarActivity {
         tabSpec.setContent(R.id.companyContacts);
         tabSpec.setIndicator("Company contacts");
         tabHost.addTab(tabSpec);
-
-
-
+        try {
+            syncCompanyContacts();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
 
         final Button submitCreateButton = (Button) findViewById(R.id.submitCreateButton);
         submitCreateButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Contacts.add(new Contact(firstName.getText().toString(), lastName.getText().toString(), emailAdress.getText().toString(), phoneNumber.getText().toString(), imageUri));
-                populateList();
+                populateContactList();
                 sendToDB();
+                try {
+                    syncCompanyContacts();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
                 Toast.makeText((getApplicationContext()), firstName.getText().toString() + " " + lastName.getText().toString()+ "  has been saved in contacts", Toast.LENGTH_SHORT).show();
             }
         });
@@ -126,6 +146,73 @@ public class MainActivity extends ActionBarActivity {
     }
 
 
+    public void syncCompanyContacts() throws IOException, JSONException {
+
+        /*DbConnectionAndPost dbConnectionAndPost = new DbConnectionAndPost();
+        JSONArray jsonArray = dbConnectionAndPost.getStringToJsonArray();
+        for (int i = 0; i < jsonArray.length() ; i++){
+            JSONObject jsonObject = jsonArray.getJSONObject(i);
+            String firstName = jsonObject.getString("firstName");
+            String lastName= jsonObject.getString("lastName");
+            String email = jsonObject.getString("email");
+            String phone = jsonObject.getString("phone");
+            companyContacts.add(new CompanyContact(firstName, lastName, email, phone));
+            populateCompanyContactList();
+        }*/
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                DbConnectionAndPost dbConnectionAndPost = new DbConnectionAndPost();
+                JSONArray jsonArray = null;
+                try {
+                    jsonArray = dbConnectionAndPost.getStringToJsonArray();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                assert jsonArray != null;
+                for (int i = 0; i < jsonArray.length() ; i++){
+                    JSONObject jsonObject = null;
+                    try {
+                        jsonObject = jsonArray.getJSONObject(i);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                    assert jsonObject != null;
+                    String firstName = null;
+                    try {
+                        firstName = jsonObject.getString("firstName");
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                    String lastName= null;
+                    try {
+                        lastName = jsonObject.getString("lastName");
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                    String email = null;
+                    try {
+                        email = jsonObject.getString("email");
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                    String phone = null;
+                    try {
+                        phone = jsonObject.getString("phone");
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                    companyContacts.add(new CompanyContact(firstName, lastName, email, phone));
+                    populateCompanyContactList();
+                }
+            }
+        }).start();
+    }
+
+
+
     public void  onActivityResult(int reqCode, int resCode, Intent data){
         if (resCode == RESULT_OK){
             if (reqCode == 1){
@@ -135,9 +222,14 @@ public class MainActivity extends ActionBarActivity {
             }
         }
     }
-    private void populateList(){
+    private void populateContactList(){
         ArrayAdapter<Contact> adapter = new ContactListAdapter();
         contactListView.setAdapter(adapter);
+    }
+
+    private void populateCompanyContactList(){
+        ArrayAdapter<CompanyContact> adapter = new CompanyContactListAdapter();
+        companyContactListView.setAdapter(adapter);
     }
     private void sendToDB() {
         try {
@@ -155,16 +247,17 @@ public class MainActivity extends ActionBarActivity {
 
                 }
             }).start();
-            new Thread(new Runnable() {
+            /*new Thread(new Runnable() {
                 @Override
                 public void run() {
                     DbConnectionAndPost dbConnectionAndPost = new DbConnectionAndPost();
                     try {
                         InputStream getJson = dbConnectionAndPost.getFromDb().getEntity().getContent();
-                        //Log.w("getJson", dbConnectionAndPost.streamToStringConverter(getJson));
-                        //String dupa = dbConnectionAndPost.getStringToJson(dbConnectionAndPost.streamToStringConverter(getJson)).getString("firstName");
-                        //Log.w("getJson", dupa);
                         dbConnectionAndPost.jsonArrayToArrayList(dbConnectionAndPost.getStringToJsonArray(dbConnectionAndPost.streamToStringConverter(getJson)));
+                        //Log.w("getJson", dbConnectionAndPost.streamToStringConverter(getJson));
+                        //String dd = dbConnectionAndPost.getStringToJson(dbConnectionAndPost.streamToStringConverter(getJson)).getString("firstName");
+                        //Log.w("getJson", dd);
+
                     } catch (IOException e) {
                         e.printStackTrace();
                     } catch (JSONException e) {
@@ -173,7 +266,7 @@ public class MainActivity extends ActionBarActivity {
 
                 }
             }).start();
-
+*/
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -204,6 +297,32 @@ public class MainActivity extends ActionBarActivity {
             phone.setText(currentContact.getPhone());
             ImageView ivContactImage = (ImageView) view.findViewById(R.id.ivContactImage);
             ivContactImage.setImageURI(currentContact.get_imageURI());
+
+            return view;
+
+        }
+    }
+
+    private class CompanyContactListAdapter extends ArrayAdapter<CompanyContact> {
+        public CompanyContactListAdapter(){
+            super(MainActivity.this, R.layout.listview_item, companyContacts);
+        }
+        @Override
+        public View getView(int position, View view, ViewGroup parent){
+            if(view == null)
+                view = getLayoutInflater().inflate(R.layout.listview_item, parent, false);
+
+            CompanyContact currentContact = companyContacts.get(position);
+
+            assert view != null;
+            TextView firstName = (TextView) view.findViewById(R.id.firstNameListField);
+            firstName.setText(currentContact.getFirstName());
+            TextView lastName = (TextView) view.findViewById(R.id.lastNameListField);
+            lastName.setText(currentContact.getLastName());
+            TextView email = (TextView) view.findViewById(R.id.emailListField);
+            email.setText(currentContact.getEmail());
+            TextView phone = (TextView) view.findViewById(R.id.phoneListField);
+            phone.setText(currentContact.getPhone());
 
             return view;
 
